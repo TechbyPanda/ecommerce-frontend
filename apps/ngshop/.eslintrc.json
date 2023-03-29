@@ -17,7 +17,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "angular-unicorn",
+            "prefix": "ngshop",
             "style": "kebab-case"
           }
         ]
