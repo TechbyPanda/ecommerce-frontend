@@ -15,4 +15,5 @@ export class Product{
   numReviews?: number;
   isFeatured?: boolean;
   dateCreated?: string;
+  [key: string]: any;
 }

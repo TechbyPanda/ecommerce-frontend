@@ -16,8 +16,8 @@ export class ProductsFormComponent implements OnInit {
   form!: FormGroup;
   isSubmitted = false;
   categories: Category[] = [];
-  imageDisplay?: string | ArrayBuffer;
-  currentProductId?: string;
+  imageDisplay: string | ArrayBuffer = ' ';
+  currentProductId = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -31,7 +31,7 @@ export class ProductsFormComponent implements OnInit {
   ngOnInit(): void {
     this._initForm();
     this._getCategories();
-    // this._checkEditMode();
+    this._checkEditMode();
   }
 
   private _initForm() {
@@ -54,103 +54,112 @@ export class ProductsFormComponent implements OnInit {
     });
   }
 
-  // private _addProduct(productData: FormData) {
-  //   this.productsService.createProduct(productData).subscribe(
-  //     (product: Product) => {
-  //       this.messageService.add({
-  //         severity: 'success',
-  //         summary: 'Success',
-  //         detail: `Product ${product.name} is created!`
-  //       });
-  //       timer(2000)
-  //         .toPromise()
-  //         .then(() => {
-  //           this.location.back();
-  //         });
-  //     },
-  //     () => {
-  //       this.messageService.add({
-  //         severity: 'error',
-  //         summary: 'Error',
-  //         detail: 'Product is not created!'
-  //       });
-  //     }
-  //   );
-  // }
+  private _addProduct(productData: FormData) {
+    this.productsService.createProduct(productData).subscribe(
+      (product: Product) => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: `Product ${product.name} is created!`
+        });
+        timer(2000)
+          .toPromise()
+          .then(() => {
+            this.location.back();
+          });
+      },
+      () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Product is not created!'
+        });
+      }
+    );
+  }
 
-  // private _updateProduct(productFormData: FormData) {
-  //   this.productsService.updateProduct(productFormData, this.currentProductId).subscribe(
-  //     () => {
-  //       this.messageService.add({
-  //         severity: 'success',
-  //         summary: 'Success',
-  //         detail: 'Product is updated!'
-  //       });
-  //       timer(2000)
-  //         .toPromise()
-  //         .then(() => {
-  //           this.location.back();
-  //         });
-  //     },
-  //     () => {
-  //       this.messageService.add({
-  //         severity: 'error',
-  //         summary: 'Error',
-  //         detail: 'Product is not updated!'
-  //       });
-  //     }
-  //   );
-  // }
+  private _updateProduct(productFormData: FormData) {
+    this.productsService.updateProduct(productFormData, this.currentProductId).subscribe(
+      () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Product is updated!'
+        });
+        timer(2000)
+          .toPromise()
+          .then(() => {
+            this.location.back();
+          });
+      },
+      () => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Product is not updated!'
+        });
+      }
+    );
+  }
 
-  // private _checkEditMode() {
-  //   this.route.params.subscribe((params) => {
-  //     if (params.id) {
-  //       this.editmode = true;
-  //       this.currentProductId = params.id;
-  //       this.productsService.getProduct(params.id).subscribe((product) => {
-  //         this.productForm.name.setValue(product.name);
-  //         this.productForm.category.setValue(product.category.id);
-  //         this.productForm.brand.setValue(product.brand);
-  //         this.productForm.price.setValue(product.price);
-  //         this.productForm.countInStock.setValue(product.countInStock);
-  //         this.productForm.isFeatured.setValue(product.isFeatured);
-  //         this.productForm.description.setValue(product.description);
-  //         this.productForm.richDescription.setValue(product.richDescription);
-  //         this.imageDisplay = product.image;
-  //         this.productForm.image.setValidators([]);
-  //         this.productForm.image.updateValueAndValidity();
-  //       });
-  //     }
-  //   });
-  // }
+  private _checkEditMode() {
+    this.route.params.subscribe((params) => {
+      if (params['id']) {
+        this.editmode = true;
+        this.currentProductId = params['id'];
+        this.productsService.getProduct(params['id']).subscribe((product) => {
+          this.controls['name'].setValue(product.name);
+          if(product.category)
+            this.controls['category'].setValue(product.category._id);
+          this.controls['brand'].setValue(product.brand);
+          this.controls['price'].setValue(product.price);
+          this.controls['countInStock'].setValue(product.countInStock);
+          this.controls['isFeatured'].setValue(product.isFeatured);
+          this.controls['description'].setValue(product.description);
+          this.controls['richDescription'].setValue(product.richDescription);
+          if(product.image)
+            this.imageDisplay = product.image;
+          this.controls['image'].setValidators([]);
+          this.controls['image'].updateValueAndValidity();
+        });
+      }
+    });
+  }
 
   onSubmit() {
     this.isSubmitted = true;
-    // if (this.form.invalid) return;
+    if (this.form.invalid) return;
+    
+    const productFormData:FormData = new FormData();
+    Object.keys(this.controls).map((key) => {
+      productFormData['append'](key, this.controls[key].value);
+    });
 
-    // const productFormData = new FormData();
-    // Object.keys(this.productForm).map((key) => {
-    //   productFormData.append(key, this.productForm[key].value);
-    // });
-    // if (this.editmode) {
-    //   this._updateProduct(productFormData);
-    // } else {
-    //   this._addProduct(productFormData);
-    // }
+    if (this.editmode) {
+      this._updateProduct(productFormData);
+    } else {
+      this._addProduct(productFormData);
+    }
   }
   // onCancle() {}
 
   onImageUpload(event:any) {
     const file = event.target.files[0];
-    // if (file) {
-    //   this.form.patchValue({ image: file });
-    //   this.form.get('image').updateValueAndValidity();
-    //   const fileReader = new FileReader();
-    //   fileReader.onload = () => {
-    //     this.imageDisplay = fileReader.result;
-    //   };
-    //   fileReader.readAsDataURL(file);
-    // }
+    if (file) {
+      this.form.patchValue({ image: file });
+      const imageControl = this.form.get('image');
+
+      if (imageControl) {
+        imageControl.updateValueAndValidity();
+      }
+
+      const fileReader = new FileReader();
+      fileReader.onload = () => {
+        if(fileReader.result)
+          this.imageDisplay = fileReader.result;
+      };
+      fileReader.readAsDataURL(file);
+    }
   }
 
   get controls() {

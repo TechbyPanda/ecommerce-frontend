@@ -16,7 +16,8 @@ export class ProductsService {
     return this.http.get<Product[]>(this.apiUrlProduct);
   }
 
-  createProduct(product:Product):Observable<Product>{
+  createProduct(product:FormData):Observable<Product>{
+    console.log(product);
     return this.http.post<Product>(this.apiUrlProduct, product);
   }
 
@@ -28,7 +29,7 @@ export class ProductsService {
     return this.http.get<Product>(this.apiUrlProduct+id);
   }
 
-  updateProduct(id: string, product:Product):Observable<Product> {
+  updateProduct(product:FormData, id: string):Observable<Product> {
     return this.http.put<Product>(this.apiUrlProduct+id, product);
   }
 }
