@@ -28,7 +28,11 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { DropdownModule } from 'primeng/dropdown';
 import { EditorModule } from 'primeng/editor';
-
+import { UsersListComponent } from './pages/users/users-list/users-list.component';
+import { UserFormComponent } from './pages/users/user-form/user-form.component';
+import { UsersService } from '@angular-unicorn/users';
+import { TagModule } from 'primeng/tag';
+import { InputMaskModule } from 'primeng/inputmask';
 
 const UX_MODULE = [
   CardModule,
@@ -43,7 +47,9 @@ const UX_MODULE = [
   InputTextareaModule,
   InputSwitchModule,
   DropdownModule,
-  EditorModule
+  EditorModule,
+  TagModule,
+  InputMaskModule
 ]
 
 const routes:Route[] = [
@@ -56,13 +62,16 @@ const routes:Route[] = [
       { path: 'categories/form/:id', component: CategoryFormComponent },
       { path: 'products', component: ProductsListComponent },
       { path: 'products/form', component: ProductsFormComponent },
-      { path: 'products/form/:id', component: ProductsFormComponent }
+      { path: 'products/form/:id', component: ProductsFormComponent },
+      { path: 'users', component: UsersListComponent },
+      { path: 'users/form', component: UserFormComponent },
+      { path: 'users/form/:id', component: UserFormComponent }
     ]
   }
 ]
 
 @NgModule({
-  declarations: [AppComponent, ShellComponent, SidebarComponent, DashboardComponent, CategoriesListComponent, CategoryFormComponent, ProductsListComponent, ProductsFormComponent],
+  declarations: [AppComponent, ShellComponent, SidebarComponent, DashboardComponent, CategoriesListComponent, CategoryFormComponent, ProductsListComponent, ProductsFormComponent, UsersListComponent, UserFormComponent],
   imports: [
     BrowserModule,
     RouterModule.forRoot(routes, { initialNavigation: 'enabledBlocking' }),
@@ -72,7 +81,7 @@ const routes:Route[] = [
     ReactiveFormsModule,
     BrowserAnimationsModule
   ],
-  providers: [CategoriesService, MessageService, ConfirmationService],
+  providers: [CategoriesService, MessageService, ConfirmationService, UsersService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
